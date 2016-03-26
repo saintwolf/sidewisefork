@@ -9,7 +9,7 @@ var DataTree = function(a) {
   for (var b = a.length - 1; 0 <= b; b--) this.addIndex(a[b])
 };
 DataTree.prototype = {
-  getNode: function(a) {
+  getNode: function(a) { //TODO: Does not correctly hangle calls like getNode(int windowId), see commit bbefea0 
     if ("string" == typeof a) return a = this.indexes.id[a], !a ? void 0 : a[0];
     if (Array.isArray(a)) {
       var b = this.indexes[a[0]];

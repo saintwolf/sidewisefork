@@ -507,15 +507,27 @@ PageTree.prototype = {
       }, CONFORM_ALL_TAB_INDEX_DELAY_MS)
     }
   },
-  updatePageIndex: function(a, c, b, d) {
-    log("updating page index", a, c, b, d);
-    a = this.getNode(["chromeId", a]);
-    tree.updateNode(a, {
-      windowId: c
+  updatePageIndex: function(tab_id, window_id, from, to) {
+    log("updating page index", tab_id, window_id, from, to);
+    tab = this.getNode(["chromeId", tab_id]);
+    tree.updateNode(tab, {
+      windowId: window_id
     });
-    d < b ? (a.index = d, b = this.tabIndexes[c][d]) : (a.index = d, b = this.tabIndexes[c][d + 1]);
-    b ? (log("moving to before by index", a.id, "before", b.id), this.moveNodeRel(a, "before", b)) : (log("moving to append by index", a.id, "append to", c),
-      this.moveNodeRel(a, "append", this.getNode(c)))
+    if (to < from) {
+      tab.index = to, from = this.tabIndexes[window_id][to]
+    } else {
+      tab.index = to, from = this.tabIndexes[window_id][to + 1]
+    }
+    if (from){ //If there's something after that
+      log("moving to before by index", tab.id, "before", from.id);
+      this.moveNodeRel(tab, "before", from);
+    } else{ //Else append at last position of window
+      log("moving to append by index", tab.id, "append to", window_id);
+      var to_node = this.getNode(window_id); //TODO: THIS fails when moving existing tab to rightmost position
+      /* Something like this might fix it, but produces new problems */
+      //var to_node = this.getNode(["chromeId", window_id]);
+      this.moveNodeRel(tab, "append", to_node); 
+    }
   },
   clear: function() {
     this.root = new DataTreeRootNode(this);
